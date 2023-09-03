@@ -1,0 +1,7 @@
+server:
+  port: 9000
+netty:
+  port: 9010
+  threads:
+    boss: 1
+    worker: 4

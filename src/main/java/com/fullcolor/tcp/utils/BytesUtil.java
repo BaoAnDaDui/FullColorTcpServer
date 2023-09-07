@@ -1,11 +1,7 @@
 package com.fullcolor.tcp.utils;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.util.ReferenceCountUtil;
-
-import java.util.Arrays;
 
 /**
  * 字节工具
@@ -78,8 +74,8 @@ public class BytesUtil {
      * 异或 解密
      */
     private static ByteBuf xorDecrypt(ByteBuf src, byte speed) {
-        ByteBuf dest = src.alloc().buffer(src.capacity());
-        while (src.readableBytes() >0) {
+        ByteBuf dest = src.alloc().buffer(src.readableBytes());
+        for (int i = src.readerIndex(); i < src.writerIndex(); i++) {
             dest.writeByte(src.readByte() ^ speed);
         }
         return dest;
@@ -102,8 +98,8 @@ public class BytesUtil {
      * 异或 并且将结果作为下一字节的种子 解密
      */
     private static ByteBuf xorDecrypt2(ByteBuf src, byte speed) {
-        ByteBuf dest = src.alloc().buffer(src.capacity());
-        while (src.readableBytes() >0){
+        ByteBuf dest = src.alloc().buffer(src.readableBytes());
+        for (int i = 0; i < src.readableBytes(); i++) {
             byte data = src.readByte();
             byte decrypted = (byte) (data ^ speed);
             dest.writeByte(decrypted);
@@ -129,17 +125,13 @@ public class BytesUtil {
      * 异或 种子 左一 一位 解密
      */
     private static ByteBuf xorDecrypt3(ByteBuf src, byte speed) {
-        ByteBuf dest = src.alloc().buffer(src.capacity());
-        byte[] srcBytes = getBufBytes(src);
-        byte[] destBytes = new byte[srcBytes.length];
-        for (int i = srcBytes.length-1; i <= 0; i--){
-            byte data = srcBytes[i];
+        ByteBuf dest = src.alloc().buffer(src.readableBytes());
+        while (src.readableBytes()>0) {
+            byte data = src.readByte();
             byte decrypted = (byte) (data ^ speed);
-            destBytes[i] = decrypted;
+            dest.writeByte(decrypted);
             speed = (byte) (speed >>> 1);  // 无符号右移
-
         }
-        dest.writeBytes(destBytes);
         return dest;
     }
 
@@ -161,27 +153,14 @@ public class BytesUtil {
      * 异或 种子 右一 一位 解密
      */
     private static ByteBuf xorDecrypt4(ByteBuf src, byte speed) {
-        ByteBuf dest = src.alloc().buffer(src.capacity());
-        byte[] srcBytes = getBufBytes(src);
-        byte[] destBytes = new byte[srcBytes.length];
-        for (int i = srcBytes.length-1; i <= 0; i--){
-            byte data = srcBytes[i];
+        ByteBuf dest = src.alloc().buffer(src.readableBytes());
+        while (src.readableBytes()>0) {
+            byte data = src.readByte();
             byte decrypted = (byte) (data ^ speed);
-            destBytes[i] = decrypted;
-            speed = (byte) (speed << 1);
-
+            dest.writeByte(decrypted);
+            speed = (byte) (speed << 1);  // 无符号左移
         }
-        return dest.writeBytes(destBytes);
+        return dest;
     }
 
-
-   static byte [] getBufBytes(ByteBuf buf){
-        if (buf.hasArray()) {
-            return buf.array();
-        } else {
-            byte[] bytes = new byte[buf.readableBytes()];
-            buf.getBytes(buf.readerIndex(), bytes);
-            return bytes;
-        }
-    }
 }

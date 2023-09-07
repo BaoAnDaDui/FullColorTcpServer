@@ -30,16 +30,6 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
         ctx.close();
     }
 
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
-            IdleState state = ((IdleStateEvent) evt).state();
-            logger.warn("客户端:[{}],idle why:{}", ctx.channel().remoteAddress(), state);
-        } else {
-            super.userEventTriggered(ctx, evt);
-        }
-    }
-
 
     @Autowired
     public void setChannelManager(TcpChannelManager channelManager) {

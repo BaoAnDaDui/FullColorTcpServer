@@ -67,7 +67,7 @@ public class TcpDecoder extends ByteToMessageDecoder {
         }
         packetHeader.setMagic(magic);
         //报文长度
-        int frameLength = in.readBytes(4).getIntLE(4);
+        int frameLength = in.readBytes(4).readIntLE();
         packetHeader.setFrameLength(frameLength);
         // 版本
         byte protocolVersion = in.readByte();
@@ -77,21 +77,22 @@ public class TcpDecoder extends ByteToMessageDecoder {
         packetHeader.setProtocolType(protocolType);
         // 加密类型
         byte encryptionType = in.readByte();
+        logger.info("encryptionType :{}", encryptionType);
         packetHeader.setEncryptionType(encryptionType);
         // 加密种子
         byte encryptionSeed = in.readByte();
         packetHeader.setEncryptionSeed(encryptionSeed);
         // 未加密时候 指令长度
-        int textLength = in.readBytes(4).getIntLE(4);
+        int textLength = in.readBytes(4).readIntLE();
         packetHeader.setTextLength(textLength);
         // 未加密二进制 报文长度
-        int binaryLength = in.readBytes(4).getIntLE(4);
+        int binaryLength = in.readBytes(4).readIntLE();
         packetHeader.setBinaryLength(binaryLength);
         // Reserved 保留8 字节0
         long reserved = in.readBytes(8).readLongLE();
         packetHeader.setReserved(reserved);
         // MessageSequence
-        short messageSequence = in.readBytes(2).readShortLE();
+        int messageSequence = in.readBytes(2).readUnsignedShortLE();
         packetHeader.setMessageSequence(messageSequence);
         // DataChecksum
         byte dataChecksum = in.readByte();
@@ -113,12 +114,16 @@ public class TcpDecoder extends ByteToMessageDecoder {
         // 读取数据部分
         ByteBuf data = in.readBytes(in.readableBytes());
         // 解密后数据
-        ByteBuf rawData = BytesUtil.decryptByteBuf(data, encryptionType, encryptionType);
+        ByteBuf rawData = BytesUtil.decryptByteBuf(data, encryptionType, encryptionSeed);
+        logger.info("rawData can read:{},txt length:{}", rawData.readableBytes(),textLength);
         // 读取指令内容
-        if (rawData.readableBytes() != textLength) {
+        if (rawData.capacity() != textLength) {
             logger.error("指令部分数据解析与预期不符合,textLength:[{}],can readByteLength :[{}]read buf from", textLength, rawData.readableBytes());
         }
+
         String instructStr = BytesUtil.convertByteBufToString(rawData.readBytes(textLength));
+        logger.info("instructStr:{}", instructStr);
+
         InstructData instructData = JSONObject.parseObject(instructStr, InstructData.class);
         if (Objects.isNull(instructData)) {
             return null;

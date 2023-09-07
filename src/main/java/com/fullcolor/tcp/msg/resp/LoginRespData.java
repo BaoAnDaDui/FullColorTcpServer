@@ -31,7 +31,7 @@ public class LoginRespData implements OutboundMsg {
     }
 
     @Override
-    public short getMessageSequence() {
+    public int getMessageSequence() {
         return 1;
     }
 }

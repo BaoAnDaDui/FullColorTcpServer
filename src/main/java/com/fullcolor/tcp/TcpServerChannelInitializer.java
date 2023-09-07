@@ -35,7 +35,6 @@ public class TcpServerChannelInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new IdleStateHandler(6, 6, 60, TimeUnit.SECONDS));
         pipeline.addLast(new TcpDecoder());
         pipeline.addLast(new TcpEncoder());
         pipeline.addLast(heartbeatHandler);

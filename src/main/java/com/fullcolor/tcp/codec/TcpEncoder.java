@@ -67,7 +67,6 @@ public class TcpEncoder extends MessageToByteEncoder<OutboundMsg> {
         byteBuf.writeBytes(bb);
         ReferenceCountUtil.safeRelease(sourceOutRaw);
         ReferenceCountUtil.safeRelease(encryptRaw);
-        ReferenceCountUtil.safeRelease(bb);
     }
 
 }

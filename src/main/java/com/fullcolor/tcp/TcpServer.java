@@ -56,9 +56,10 @@ public class TcpServer {
         serverBootstrap.group(bossEventLoopGroup, workerEventLoopGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(channelInitializer)
-                .option(ChannelOption.SO_BACKLOG, 1024)
-                .childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
+                .option(ChannelOption.SO_BACKLOG, 2048);
+        // 用户自己维护心跳 不必 使用tcp
+//                .childOption(ChannelOption.TCP_NODELAY, true)
+//                .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
         if (channelFuture.isSuccess()) {

@@ -14,7 +14,7 @@ public interface OutboundMsg {
      * @return byte
      */
     default byte getEncryptType() {
-        return (byte) 150;
+        return (byte) 1;
     }
 
     /**
@@ -31,5 +31,5 @@ public interface OutboundMsg {
      *
      * @return
      */
-    short getMessageSequence();
+    int getMessageSequence();
 }

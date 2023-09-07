@@ -29,8 +29,7 @@ public class InstructRespData implements OutboundMsg {
     }
 
     @Override
-    public short getMessageSequence() {
-        int randomEvenNum = ThreadLocalRandom.current().nextInt((16383)) * 2 + 1;
-        return (short) randomEvenNum;
+    public int getMessageSequence() {
+        return ThreadLocalRandom.current().nextInt((16383)) * 2 + 1;
     }
 }

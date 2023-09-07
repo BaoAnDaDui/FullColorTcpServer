@@ -56,7 +56,7 @@ public class DeviceController {
     }
 
     /**
-     * 获取设备
+     * 获取设备 指令反馈结果
      *
      * @param deviceId 设备pid
      * @return List<InstructData>

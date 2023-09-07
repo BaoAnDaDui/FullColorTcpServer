@@ -62,7 +62,7 @@ public class PacketHeader implements OutboundMsg {
     /**
      * 消息id
      */
-    private short messageSequence;
+    private int messageSequence;
 
 
     /**
@@ -149,11 +149,12 @@ public class PacketHeader implements OutboundMsg {
         this.reserved = reserved;
     }
 
-    public short getMessageSequence() {
+    @Override
+    public int getMessageSequence() {
         return messageSequence;
     }
 
-    public void setMessageSequence(short messageSequence) {
+    public void setMessageSequence(int messageSequence) {
         this.messageSequence = messageSequence;
     }
 

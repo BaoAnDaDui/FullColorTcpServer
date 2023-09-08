@@ -30,6 +30,6 @@ public class InstructRespData implements OutboundMsg {
 
     @Override
     public int getMessageSequence() {
-        return ThreadLocalRandom.current().nextInt((16383)) * 2 + 1;
+        return ThreadLocalRandom.current().nextInt(0x8000) * 2 ;
     }
 }

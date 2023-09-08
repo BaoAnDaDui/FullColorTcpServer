@@ -78,9 +78,11 @@ public class TcpDecoder extends ByteToMessageDecoder {
         // 加密类型
         byte encryptionType = in.readByte();
         logger.info("encryptionType :{}", encryptionType);
+        System.out.println(encryptionType);
         packetHeader.setEncryptionType(encryptionType);
         // 加密种子
         byte encryptionSeed = in.readByte();
+        System.out.println(encryptionSeed);
         packetHeader.setEncryptionSeed(encryptionSeed);
         // 未加密时候 指令长度
         int textLength = in.readBytes(4).readIntLE();
@@ -136,5 +138,4 @@ public class TcpDecoder extends ByteToMessageDecoder {
         ReferenceCountUtil.safeRelease(rawData);
         return new InstructDataRespMsg(packetHeader, instructData);
     }
-
 }

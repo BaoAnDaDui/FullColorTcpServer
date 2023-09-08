@@ -27,6 +27,16 @@ public class BytesUtil {
         return str;
     }
 
+    private static byte[] getBytes(ByteBuf buf){
+        if (buf.hasArray()) {
+            return buf.array();
+        } else {
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.getBytes(buf.readerIndex(), bytes);
+            return bytes;
+        }
+    }
+
     public static byte[] encryptByteBuf(byte[] buf, byte encryptionType, byte encryptionSpeed) {
         switch (encryptionType) {
             case 1:
@@ -87,9 +97,11 @@ public class BytesUtil {
     private static byte[] xorEncrypt2(byte[] src, byte speed) {
         byte[] dest = new byte[src.length];
         for (int i = 0; i < src.length; i++) {
-            byte encrypted = (byte) (src[i] ^ speed);
-            dest[i] = encrypted;
-            speed = encrypted;
+            if (i==0){
+                dest[i] = (byte) (src[i] ^ speed);
+            }else {
+                dest[i] = (byte) (src[i] ^ src[i-1]);
+            }
         }
         return dest;
     }
@@ -99,11 +111,13 @@ public class BytesUtil {
      */
     private static ByteBuf xorDecrypt2(ByteBuf src, byte speed) {
         ByteBuf dest = src.alloc().buffer(src.readableBytes());
-        for (int i = 0; i < src.readableBytes(); i++) {
-            byte data = src.readByte();
-            byte decrypted = (byte) (data ^ speed);
-            dest.writeByte(decrypted);
-            speed = data;
+        byte[] srcArray = getBytes(src);
+        for (int i = 0; i < srcArray.length; i++) {
+            if (i==0){
+                dest.writeByte(srcArray[i] ^ speed);
+            }else {
+                dest.writeByte(srcArray[i] ^ srcArray[i-1]);
+            }
         }
         return dest;
     }
@@ -126,7 +140,7 @@ public class BytesUtil {
      */
     private static ByteBuf xorDecrypt3(ByteBuf src, byte speed) {
         ByteBuf dest = src.alloc().buffer(src.readableBytes());
-        while (src.readableBytes()>0) {
+        for (int i = src.readerIndex(); i < src.writerIndex(); i++) {
             byte data = src.readByte();
             dest.writeByte((data ^ speed));
             int overflow = (speed>>7) & 0x01;
@@ -143,8 +157,8 @@ public class BytesUtil {
         byte[] dest = new byte[src.length];
         for (int i = 0; i < src.length; i++) {
             dest[i] =(byte) (src[i] ^ speed);
-            int overflow = (speed<<7) & 0x80;
-            speed = (byte) (((speed >> 1)&0xff)|overflow);
+            int overflow = (speed << 7) & 0x80;
+            speed = (byte) (((speed >> 1) & 0x7f) | overflow);
         }
         return dest;
     }
@@ -154,13 +168,14 @@ public class BytesUtil {
      */
     private static ByteBuf xorDecrypt4(ByteBuf src, byte speed) {
         ByteBuf dest = src.alloc().buffer(src.readableBytes());
-        while (src.readableBytes()>0) {
+        for (int i = src.readerIndex(); i < src.writerIndex(); i++) {
             byte data = src.readByte();
             dest.writeByte(data ^ speed);
-            int overflow = (speed<<7) & 0x80;
-            speed = (byte) (((speed >> 1)&0xff)|overflow);
+            int overflow = (speed << 7) & 0x80;
+            speed = (byte) (((speed >> 1)& 0x7f)| overflow);
         }
         return dest;
+
     }
 
 }

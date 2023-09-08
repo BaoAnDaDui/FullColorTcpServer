@@ -1,5 +1,7 @@
 package com.fullcolor.tcp.msg.resp;
 
+import com.alibaba.fastjson2.annotation.JSONField;
+
 /**
  * tcp server
  *
@@ -13,6 +15,7 @@ public interface OutboundMsg {
      *
      * @return byte
      */
+    @JSONField(serialize=false)
     default byte getEncryptType() {
         return (byte) 1;
     }
@@ -22,6 +25,7 @@ public interface OutboundMsg {
      *
      * @return byte
      */
+    @JSONField(serialize=false)
     default byte getEncryptSpeed() {
         return (byte) 1;
     }
@@ -31,5 +35,6 @@ public interface OutboundMsg {
      *
      * @return
      */
+    @JSONField(serialize=false)
     int getMessageSequence();
 }

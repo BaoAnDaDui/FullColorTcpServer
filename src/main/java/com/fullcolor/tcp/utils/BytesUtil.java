@@ -114,9 +114,9 @@ public class BytesUtil {
     private static byte[] xorEncrypt3(byte[] src, byte speed) {
         byte[] dest = new byte[src.length];
         for (int i = 0; i < src.length; i++) {
-            byte encrypted = (byte) (src[i] ^ speed);
-            dest[i] = encrypted;
-            speed = (byte) (speed << 1);
+            dest[i] = (byte) (src[i] ^ speed);
+            int overflow = (speed>>7) & 0x01;
+            speed = (byte) (((speed << 1) &0xff) | overflow);
         }
         return dest;
     }
@@ -128,9 +128,9 @@ public class BytesUtil {
         ByteBuf dest = src.alloc().buffer(src.readableBytes());
         while (src.readableBytes()>0) {
             byte data = src.readByte();
-            byte decrypted = (byte) (data ^ speed);
-            dest.writeByte(decrypted);
-            speed = (byte) (speed >>> 1);  // 无符号右移
+            dest.writeByte((data ^ speed));
+            int overflow = (speed>>7) & 0x01;
+            speed = (byte) (((speed << 1) &0xff) | overflow);
         }
         return dest;
     }
@@ -142,9 +142,9 @@ public class BytesUtil {
     private static byte[] xorEncrypt4(byte[] src, byte speed) {
         byte[] dest = new byte[src.length];
         for (int i = 0; i < src.length; i++) {
-            byte encrypted = (byte) (src[i] ^ speed);
-            dest[i] = encrypted;
-            speed = (byte) (speed >>> 1);
+            dest[i] =(byte) (src[i] ^ speed);
+            int overflow = (speed<<7) & 0x80;
+            speed = (byte) (((speed >> 1)&0xff)|overflow);
         }
         return dest;
     }
@@ -156,9 +156,9 @@ public class BytesUtil {
         ByteBuf dest = src.alloc().buffer(src.readableBytes());
         while (src.readableBytes()>0) {
             byte data = src.readByte();
-            byte decrypted = (byte) (data ^ speed);
-            dest.writeByte(decrypted);
-            speed = (byte) (speed << 1);  // 无符号左移
+            dest.writeByte(data ^ speed);
+            int overflow = (speed<<7) & 0x80;
+            speed = (byte) (((speed >> 1)&0xff)|overflow);
         }
         return dest;
     }

@@ -3,6 +3,7 @@ package com.fullcolor.tcp;
 import com.fullcolor.tcp.codec.TcpDecoder;
 import com.fullcolor.tcp.codec.TcpEncoder;
 import com.fullcolor.tcp.handler.HeartbeatMsgHandler;
+import com.fullcolor.tcp.handler.InstructDataMsgHandler;
 import com.fullcolor.tcp.handler.LoginHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -27,9 +28,13 @@ public class TcpServerChannelInitializer extends ChannelInitializer<SocketChanne
 
     private final LoginHandler loginHandler;
 
-    public TcpServerChannelInitializer(HeartbeatMsgHandler heartbeatHandler, LoginHandler loginHandler) {
+    private final InstructDataMsgHandler instructDataMsgHandler;
+
+    public TcpServerChannelInitializer(HeartbeatMsgHandler heartbeatHandler, LoginHandler loginHandler,
+                                       InstructDataMsgHandler dataMsgHandler) {
         this.heartbeatHandler = heartbeatHandler;
         this.loginHandler = loginHandler;
+        this.instructDataMsgHandler = dataMsgHandler;
     }
 
     @Override
@@ -39,6 +44,7 @@ public class TcpServerChannelInitializer extends ChannelInitializer<SocketChanne
         pipeline.addLast(new TcpEncoder());
         pipeline.addLast(heartbeatHandler);
         pipeline.addLast(loginHandler);
+        pipeline.addLast(instructDataMsgHandler);
     }
 
 
